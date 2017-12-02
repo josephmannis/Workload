@@ -1,0 +1,98 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:map="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        tools:context="com.example.miniprince.workload.CurrentArea" />
+
+    <!-- Wrapper for the horizontal layout containing the time in area and the area activity -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/colorPrimary" >
+
+        <!-- Wrapper for the vertical layout that displays the time in area -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="@string/time_in_area_title"
+                android:textSize="36sp"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textColor="@color/textDefault"
+                />
+
+            <!-- The current area time -->
+            <TextView
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center"
+                android:id="@+id/time_field"
+                android:text="@string/default_area_time"
+                />
+
+        </LinearLayout>
+
+        <!-- Vertical rule -->
+        <View
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:background="#7c7c7c" />
+
+        <!-- Wrapper for vertical layout that displays the area type -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_height="wrap_content"
+
+                android:text="@string/area_type_title"
+                android:textSize="36sp"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textColor="@color/textDefault"
+                />
+
+            <Button
+                android:id="@+id/btn_work"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Work"/>
+
+            <Button
+                android:id="@+id/btn_other"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Other"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
