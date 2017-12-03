@@ -39,7 +39,7 @@ public class UserData implements Serializable {
     private long timeWorkedThisDay;
 
     // Ideal number of hours the user would like to be working per week, in milliseconds.
-    private long idealTimePerWeek;
+    private long idealTimePerWeek = -1;
 
     public UserData(long idealTimePerWeek) {
         this.allWorkLocations = new HashMap<>();
@@ -53,10 +53,24 @@ public class UserData implements Serializable {
         this.idealTimePerWeek = idealTimePerWeek;
     }
 
-    /*
+    @Override
+    public String toString() {
+        return Long.toString(idealTimePerWeek);
+    }
 
+    /**
+     * Gets the ideal time the user would like to work per week, in millis.
      */
-    
+    public long getIdealTimePerWeek() {
+        return idealTimePerWeek;
+    }
+
+    /*
+    On first run of the app:
+    - Prompt the user with the "choose your distribution" screen
+    - Once that's selected, create a new UserData object with the given preferences.
+     */
+
     /*
     We have a new location. (some of this is handled in the data storage service)
     - First wait for like 20 minutes to see if they settle

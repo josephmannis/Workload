@@ -1,10 +1,11 @@
 <resources>
     <string name="app_name">Workload</string>
-    <string name="title_activity_current_area">Area</string>
+    <string name="title_activity_current_area">Workload</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="time_in_area_title">Time in area:</string>
     <string name="area_type_title">Area type:</string>
     <string name="default_area_type">Unknown</string>
     <string name="default_area_time">0:00:00</string>
+    <string name="user_data">user_data</string>
 
 </resources>

@@ -8,8 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -26,14 +24,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-
 /**
  * Starts a service that can constantly monitor the user's location, update the time spent there,
  * and determine if the area has changed.
  */
-
 public class AreaTimerService extends Service {
     private final String TAG = "ATS";
     private LocationListener locationListener;
@@ -100,7 +94,6 @@ public class AreaTimerService extends Service {
 
         Log.i(TAG, "Service is being restarted.");
 
-
         isRunning = true;
         // Initialize the location manager
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -116,17 +109,16 @@ public class AreaTimerService extends Service {
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         PendingIntent contentPendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
-        //   Bitmap icon = BitmapFactory.decodeResource(getResources(), R.drawable.my_icon);
-
         Notification notification = new NotificationCompat.Builder(this)
                 .setContentTitle(getResources().getString(R.string.app_name))
                 .setTicker(getResources().getString(R.string.app_name))
                 .setContentText("Running activity")
-                //     .setLargeIcon(Bitmap.createScaledBitmap(icon, 128, 128, false))
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(contentPendingIntent)
                 .setOngoing(true)
 //                .setDeleteIntent(contentPendingIntent)  // if needed
                 .build();
+
         notification.flags = notification.flags | Notification.FLAG_NO_CLEAR;     // NO_CLEAR makes the notification stay when the user performs a "delete all" command
         startForeground(NOTIFICATION_ID, notification);
 

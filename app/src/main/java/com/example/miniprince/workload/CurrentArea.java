@@ -65,9 +65,8 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
         timeView = findViewById(R.id.time_field);
 
         // Make sure permissions to request location are granted
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (!locationPermissionsGranted()) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-            return;
         }
 
         // Initialize the receiver for the location service.
@@ -80,6 +79,16 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
                         new IntentFilter(AreaTimerService.ACTION_LOCATION_BROADCAST));
 
         // TODO: If the NETWORK_PROVIDER is not available, make the GPS_PROVIDER an option
+    }
+
+    /**
+     * Determines if Location Permissions were granted by the user, returns true if so.
+     */
+    private boolean locationPermissionsGranted() {
+      return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+              == PackageManager.PERMISSION_GRANTED
+              && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+              == PackageManager.PERMISSION_GRANTED;
     }
 
     /**
@@ -123,7 +132,10 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
         super.onResume();
             Log.i(TAG, "Starting Service from UI.");
             activityResumed = true;
-            startService(new Intent(this, AreaTimerService.class));
+
+            if (locationPermissionsGranted()) {
+                startService(new Intent(this, AreaTimerService.class));
+            }
     }
 
     /**
