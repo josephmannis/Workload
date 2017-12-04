@@ -5,16 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Build;
-import android.provider.Settings;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -23,17 +16,12 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.List;
@@ -76,7 +64,7 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
         LocalBroadcastManager
                 .getInstance(this)
                 .registerReceiver(broadcastReceiver,
-                        new IntentFilter(AreaTimerService.ACTION_LOCATION_BROADCAST));
+                        new IntentFilter(LocationDataManager.ACTION_LOCATION_BROADCAST));
 
         // TODO: If the NETWORK_PROVIDER is not available, make the GPS_PROVIDER an option
     }
@@ -92,17 +80,17 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
     }
 
     /**
-     * Initializes the BroadcastReceiver to receive updates from the AreaTimerService
+     * Initializes the BroadcastReceiver to receive updates from the LocationDataManager
      */
     private void initBroadcastReceiver() {
         broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                double latitude = intent.getDoubleExtra(AreaTimerService.EXTRA_LATITUDE, 0);
-                double longitude = intent.getDoubleExtra(AreaTimerService.EXTRA_LONGITUDE, 0);
-                long currTime = intent.getLongExtra(AreaTimerService.LOCATION_TIME, 0);
-                boolean shouldUpdateMap = intent.getBooleanExtra(AreaTimerService.SHOULD_UPDATE_LOCATION, false);
-                boolean firstUpdate = intent.getBooleanExtra(AreaTimerService.SHOULD_PAN, false);
+                double latitude = intent.getDoubleExtra(LocationDataManager.EXTRA_LATITUDE, 0);
+                double longitude = intent.getDoubleExtra(LocationDataManager.EXTRA_LONGITUDE, 0);
+                long currTime = intent.getLongExtra(LocationDataManager.LOCATION_TIME, 0);
+                boolean shouldUpdateMap = intent.getBooleanExtra(LocationDataManager.SHOULD_UPDATE_LOCATION, false);
+                boolean firstUpdate = intent.getBooleanExtra(LocationDataManager.SHOULD_PAN, false);
 
                 if (firstUpdate) {
                     setUpdateStatus(firstUpdate);
@@ -134,7 +122,7 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
             activityResumed = true;
 
             if (locationPermissionsGranted()) {
-                startService(new Intent(this, AreaTimerService.class));
+                startService(new Intent(this, LocationDataManager.class));
             }
     }
 

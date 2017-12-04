@@ -1,5 +1,7 @@
 package com.example.miniprince.workload;
 
+import android.location.Location;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,43 +67,35 @@ public class UserData implements Serializable {
         return idealTimePerWeek;
     }
 
-    /*
-    On first run of the app:
-    - Prompt the user with the "choose your distribution" screen
-    - Once that's selected, create a new UserData object with the given preferences.
+    /**
+     * Determines if the given location is within range of any work locations in this user's history.
+     * @param location the location to examine
+     * @return true if the location is found
+     * @return null if the location is not found
      */
+    public RecordedLocation searchForPastWorkLocation(Location location) {
+        for (RecordedLocation l : allWorkLocations.values()) {
 
-    /*
-    We have a new location. (some of this is handled in the data storage service)
-    - First wait for like 20 minutes to see if they settle
-    - If they keep moving around, don't save the locations
-    - If they do settle, look at the LatLng of the area, and search the savedLocations for an instance
+            if (l.isWithinRange(location, LocationDataManager.MIN_DISTANCE)) {
+                return l;
+            }
+        }
+        return null;
+    }
 
-    If the instance is found:
-    - Set the current RecordedLocation being updated to the found instance
-    - Pop a notification saying that the work is being recorded in a saved location. Give them the option to
-      pause recording time in that place.
-
-    If the instance is not found:
-    - Detect it as a new area, and create a new RecordedLocation, initially marked as OTHER.
-    - Pop a notification letting them know that the system noticed they've settled, and that
-      it's recording their time spent there. Options: Mark as Work | Save Location
-    - Once the notification is popped, check
-
-    In the case that they mark it as work:
-    - set the LocationType to WORK
-    - save the object in allWorkLocations
-    - save the UUID in unsavedLocations
-    - every time an update is received, increment the totalTimeWorked for the location
-
-    In the case that they save the location:
-    - set the LocationType to WORK
-    - save the object in allWorkLocations
-    - save the UUID in savedLocations
-    - every time an update is received, increment the totalTimeWorked for the location
-
-    In the case they do nothing about it, and then leave:
-    - every time an update is received, increment the totalTimeWorked for the location
-    - save the object in allUnmarkedLocations
+    /**
+     * Determines if the given location is within range of any OTHER locations in this user's history.
+     * @param location the location to examine
+     * @return true if the location is found
+     * @return null if the location is not found
      */
+    public RecordedLocation searchForPastOtherLocation(Location location) {
+        for (RecordedLocation l : allUnmarkedLocations.values()) {
+
+            if (l.isWithinRange(location, LocationDataManager.MIN_DISTANCE)) {
+                return l;
+            }
+        }
+        return null;
+    }
 }

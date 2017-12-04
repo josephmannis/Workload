@@ -1,5 +1,6 @@
 package com.example.miniprince.workload;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
                 Log.i(TAG, data.toString());
             }
         });
+
+
         Paper.init(this);
     }
 
@@ -48,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     private void initButtonListener() {
         Log.i(TAG, "Initializing button listener.");
         this.buttonListener = new View.OnClickListener() {
+
+            // Initializes the UserData, sets it to the selected value, and starts the next activity
             @Override
             public void onClick(View view) {
                 Log.i(TAG, "Ok button clicked.");
@@ -78,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
                 write.start();
+
+                startActivity(new Intent(MainActivity.this, CurrentArea.class));
             }
         };
     }

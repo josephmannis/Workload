@@ -9,29 +9,36 @@ import java.util.UUID;
  * Representation of a recorded location. These locations are created when the user enters a new area
  * and remains in that area for enough time to be deemed significant.
  */
-
 public class RecordedLocation implements Serializable {
 
-    private long latitude;
-    private long longitude;
-    private LocationType.Location type;
+    private double latitude;
+    private double longitude;
+    private LocationType type;
     private long totalTimeSpent; // In milliseconds
+    private long lastTimeVisited; // In milliseconds
     private final UUID id;
     private long creationDate; // In milliseconds
+    private boolean isSaved;
+    private boolean isNewlyCreated;
 
     /**
      * Creates a new SavedLocation at the given latitude and longtiude, and with the type.
      * @param latitude the latitude of this SavedLocation's location
      * @param longitude the longitude of this SavedLocation's location
      * @param type the type of this SavedLocation
+     * @param creationDate the point at which this RecordedLocation was initialized, in milliseconds
+     * @param isSaved displays whether or not the user has saved this location
      */
-    public RecordedLocation(long latitude, long longitude, LocationType.Location type) {
+    public RecordedLocation(double latitude, double longitude, LocationType type, long creationDate, boolean isSaved) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.type = type;
         this.totalTimeSpent = 0;
         this.id = UUID.randomUUID();
-        this.creationDate = System.currentTimeMillis();
+        this.creationDate = creationDate;
+        this.lastTimeVisited = creationDate;
+        this.isSaved = isSaved;
+        this.isNewlyCreated = true;
     }
 
     /**
@@ -53,7 +60,7 @@ public class RecordedLocation implements Serializable {
     /**
      * Gets the LocationType for this SavedLocation.
      */
-    public LocationType.Location getType() {
+    public LocationType getType() {
         return type;
     }
 
@@ -61,7 +68,7 @@ public class RecordedLocation implements Serializable {
      * Sets the LocationType for this SavedLocation
      * @param type
      */
-    public void setLocationType(LocationType.Location type) {
+    public void setLocationType(LocationType type) {
         this.type = type;
     }
 
@@ -87,4 +94,42 @@ public class RecordedLocation implements Serializable {
         return id;
     }
 
+    /**
+     * @return true if this RecordedLocation is saved
+     */
+    public boolean isSaved() {
+        return this.isSaved;
+    }
+
+    /**
+     * Sets the saved status of this RecordedLocation
+     * @param b value to set
+     */
+    public void setSaved(boolean b) {
+        this.isSaved = b;
+    }
+
+
+    /**
+     * Sets the last time this RecordedLocation was visited
+     * @param millis the time to set
+     */
+    public void setLastTimeVisited(long millis) {
+        this.lastTimeVisited = millis;
+    }
+
+    /**
+     * Determines if this RecordedLoction is a newly created location, that is, it is not already
+     * stored everywhere.
+     */
+    public boolean isNewlyCreated() {
+        return this.isNewlyCreated;
+    }
+
+    /**
+     * Sets the status of this RecordedLoction's creation status.
+     */
+    public void setNewlyCreated(boolean b) {
+        this.isNewlyCreated = b;d
+    }
 }
