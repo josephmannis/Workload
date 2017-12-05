@@ -29,4 +29,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     compile 'io.paperdb:paperdb:2.6'
     compile 'org.adw.library:discrete-seekbar:1.0.1'
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.0.3'
+    compile 'net.danlew:android.joda:2.9.9.1'
+
 }

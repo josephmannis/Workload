@@ -1,10 +1,15 @@
 package com.example.miniprince.workload;
 
 import android.location.Location;
+import android.util.Log;
+
+import org.joda.time.DateTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -16,6 +21,8 @@ import java.util.UUID;
  */
 
 public class UserData implements Serializable {
+    private final static String TAG = "UD";
+
     // A list of all of the recorded work locations, from the past year.
     private HashMap<UUID, RecordedLocation> allWorkLocations;
 
@@ -97,5 +104,79 @@ public class UserData implements Serializable {
             }
         }
         return null;
+    }
+
+    /**
+     * Determines the type of a RecordedLocation and stores it in the corresponding location.
+     * @throws IllegalArgumentException if the RecordedLocation passed is already in the database
+     */
+    public void storeNewLocation(RecordedLocation r) {
+        if (!r.isNewlyCreated()) {
+            throw new IllegalArgumentException("RecordedLocation must be newly created.");
+        }
+
+        // Set it as no longer newly created
+        r.setNewlyCreated(false);
+
+        // Add it to the total time worked
+        totalTimeWorked += r.getTotalTimeSpent();
+
+        // If it's an OTHER, place it into unmarked
+        if (r.getType() == LocationType.OTHER) {
+            Log.i(TAG, "Storing OTHER location.");
+            allUnmarkedLocations.put(r.getId(), r);
+            return;
+        }
+
+        // Otherwise, check if it's saved or unsaved work
+        allWorkLocations.put(r.getId(), r);
+
+        if (r.isSaved()) {
+            Log.i(TAG, "Storing saved work location.");
+
+            savedLocations.add(r.getId());
+        } else {
+            Log.i(TAG, "Storing unsaved work location.");
+
+            unsavedLocations.add(r.getId());
+        }
+    }
+
+    /**
+     * Determines the total type worked in the given category of RecordedLocations.
+     * @param type the category of RecordedLocations to search through
+     * @param range the date at which a location must start after to be considered
+     * @return the total time for that category in the given range
+     */
+    public long totalTimeWorked(PieChartCreator.DataType type, DateTime range) {
+        switch (type) {
+            case IDEAL:
+                return getIdealTimePerWeek();
+            case TOTAL:
+                return getTotalTimeWorkedInArea(allWorkLocations, new ArrayList<UUID>(allWorkLocations.keySet()), range);
+            case WORK_SAVED:
+                return getTotalTimeWorkedInArea(allWorkLocations, savedLocations, range);
+            case WORK_UNSAVED:
+                return getTotalTimeWorkedInArea(allWorkLocations, unsavedLocations, range);
+            default:
+                throw new IllegalStateException("No recognized data type.");
+        }
+    }
+
+    /**
+     * Gets the total type worked in the given category of RecordedLocations. Helper for totalTimeWorked
+     * @param source the map to search for ids in
+     * @param keys the ids of all relevant RecordedLocations
+     * @param range the threshold for a RecordedLocation to be considered
+     * @return the total time spent based on the given conditions
+     */
+    private long getTotalTimeWorkedInArea(HashMap<UUID, RecordedLocation> source, List<UUID> keys, DateTime range) {
+        long total = 0;
+
+        for (UUID id : keys) {
+            total += source.get(id).getTimeVisitedInRange(range);
+        }
+
+        return total;
     }
 }

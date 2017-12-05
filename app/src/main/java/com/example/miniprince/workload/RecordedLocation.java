@@ -1,8 +1,16 @@
 package com.example.miniprince.workload;
 
 import android.location.Location;
+import android.util.Log;
+
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.LocalDate;
 
 import java.io.Serializable;
+import java.time.Year;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.UUID;
 
 /**
@@ -15,30 +23,27 @@ public class RecordedLocation implements Serializable {
     private double longitude;
     private LocationType type;
     private long totalTimeSpent; // In milliseconds
-    private long lastTimeVisited; // In milliseconds
     private final UUID id;
-    private long creationDate; // In milliseconds
     private boolean isSaved;
     private boolean isNewlyCreated;
+    private ArrayList<Interval> timesVisited;
 
     /**
      * Creates a new SavedLocation at the given latitude and longtiude, and with the type.
      * @param latitude the latitude of this SavedLocation's location
      * @param longitude the longitude of this SavedLocation's location
      * @param type the type of this SavedLocation
-     * @param creationDate the point at which this RecordedLocation was initialized, in milliseconds
      * @param isSaved displays whether or not the user has saved this location
      */
-    public RecordedLocation(double latitude, double longitude, LocationType type, long creationDate, boolean isSaved) {
+    public RecordedLocation(double latitude, double longitude, LocationType type, boolean isSaved) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.type = type;
         this.totalTimeSpent = 0;
         this.id = UUID.randomUUID();
-        this.creationDate = creationDate;
-        this.lastTimeVisited = creationDate;
         this.isSaved = isSaved;
         this.isNewlyCreated = true;
+        this.timesVisited = new ArrayList<Interval>();
     }
 
     /**
@@ -76,6 +81,7 @@ public class RecordedLocation implements Serializable {
      * @return the total amount of time spent at this SavedLocation.
      */
     public long getTotalTimeSpent() {
+
         return totalTimeSpent;
     }
 
@@ -111,14 +117,6 @@ public class RecordedLocation implements Serializable {
 
 
     /**
-     * Sets the last time this RecordedLocation was visited
-     * @param millis the time to set
-     */
-    public void setLastTimeVisited(long millis) {
-        this.lastTimeVisited = millis;
-    }
-
-    /**
      * Determines if this RecordedLoction is a newly created location, that is, it is not already
      * stored everywhere.
      */
@@ -130,6 +128,31 @@ public class RecordedLocation implements Serializable {
      * Sets the status of this RecordedLoction's creation status.
      */
     public void setNewlyCreated(boolean b) {
-        this.isNewlyCreated = b;d
+        this.isNewlyCreated = b;
+    }
+
+    /**
+     * Adds an interval to this RecordedLocation and updates the totalTimeSpent.
+     */
+    public void addInterval(Interval i) {
+        this.timesVisited.add(i);
+        totalTimeSpent += i.toDurationMillis();
+    }
+
+    /**
+     * Gets the amount of time this RecordedLocation was visited after the given DateTime.
+     * @param threshold the DateTime from which to check
+     * @return the total time visited in the range
+     */
+    public long getTimeVisitedInRange(DateTime threshold) {
+        long totalTime = 0;
+
+        for (Interval i : timesVisited) {
+            if (i.getStart().getMillis() >= threshold.getMillis()) {
+                totalTime += i.toDurationMillis();
+            }
+        }
+
+        return totalTime;
     }
 }

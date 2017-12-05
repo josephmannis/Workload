@@ -1,91 +1,98 @@
 package com.example.miniprince.workload;
 
-import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
+        import android.support.v7.app.AppCompatActivity;
+        import android.os.Bundle;
+        import android.util.Log;
 
-import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
+        import com.github.mikephil.charting.charts.PieChart;
+        import com.github.mikephil.charting.data.PieData;
+        import com.github.mikephil.charting.data.PieDataSet;
+        import com.github.mikephil.charting.data.PieEntry;
 
-import io.paperdb.Paper;
+        import net.danlew.android.joda.JodaTimeAndroid;
+
+        import org.joda.time.DateTime;
+        import org.joda.time.Interval;
+
+        import java.util.ArrayList;
+        import java.util.Calendar;
+        import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private final String TAG = "MA";
-    private DiscreteSeekBar bar;
-    private Button okButton;
-    private Button read;
-    private View.OnClickListener buttonListener;
-    private UserData newUser;
-    private Thread write;
+    private static final String TAG = "MA";
+
+    // The currently selected distribution
+    private PieChart currentBalance;
+
+    // The ideal distribution
+    private PieChart idealBalance;
+
+    // The user data to read
+    private UserData userData;
+
+    // The creator for the charts
+    private PieChartCreator chartCreator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        JodaTimeAndroid.init(this);
 
-        initButtonListener();
-        bar = findViewById(R.id.ratio_seek_bar);
-        okButton = findViewById(R.id.ok_btn);
-        okButton.setOnClickListener(buttonListener);
-        read = findViewById(R.id.read_btn);
-        read.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i(TAG, "Attempting to read data.");
-                Log.i(TAG, Boolean.toString(write.isAlive()));
+        // Initialize the chart for current balance
+        currentBalance = (PieChart) findViewById(R.id.current_balance);
 
-                UserData data = Paper.book().read(getResources().getString(R.string.user_data));
-                Log.i(TAG, data.toString());
-            }
-        });
+        // Initialize the chart for the ideal balance
+        idealBalance = (PieChart) findViewById(R.id.ideal_balance);
 
+        // Read the current user data
+        userData = new UserData(144000000);
 
-        Paper.init(this);
+        DateTime startOfDay = DateTime.now().withTimeAtStartOfDay();
+
+        RecordedLocation rl = new RecordedLocation(1,1, LocationType.WORK, true);
+        rl.addInterval(new Interval(startOfDay, new DateTime(28800000 + startOfDay.getMillis())));
+
+        RecordedLocation rl1 = new RecordedLocation(2,2, LocationType.WORK, true);
+        rl1.addInterval(new Interval(startOfDay, new DateTime(36000000 + startOfDay.getMillis())));
+
+     //   userData.storeNewLocation(rl);
+     //   userData.storeNewLocation(rl1);
+
+        refreshData();
     }
 
     /**
-     * Initializes the OnClickListener for the okay button.
+     * Refreshes the data of each PieChart in the display.
      */
-    private void initButtonListener() {
-        Log.i(TAG, "Initializing button listener.");
-        this.buttonListener = new View.OnClickListener() {
+    private void refreshData(PieChartCreator.DataType type,
+                             PieChartCreator.Range range) {
+        Log.i(TAG, Long.toString(userData.getTimeWorkedThisDay()));
 
-            // Initializes the UserData, sets it to the selected value, and starts the next activity
-            @Override
-            public void onClick(View view) {
-                Log.i(TAG, "Ok button clicked.");
+        currentBalance = chartCreator.generate(type, range);
 
-                long ideal = bar.getProgress() * 3600000;
-                newUser = new UserData(ideal);
+        idealBalance = chartCreator.generate(PieChartCreator.DataType.IDEAL, range);
 
-                write = new Thread(new Runnable() {
-                    volatile boolean isRunning = true;
+        float timeInDay = 86400000;
 
-                    @Override
-                    public void run() {
-                        Log.i(TAG, "Starting to write data.");
-                        Paper.book().write(getResources().getString(R.string.user_data), newUser);
+        float dayPercentage = (1 - (timeInDay / userData.getTimeWorkedThisDay())) * 100;
+        Log.i(TAG, Float.toString(dayPercentage));
+        float otherPercentage = 100 - dayPercentage;
 
-                        while (isRunning) {
-                            UserData temp = Paper.book().read(getResources().getString(R.string.user_data));
-                            if (temp.getIdealTimePerWeek() == -1) {
-                                Log.i(TAG, "Data being written.");
-                            } else {
-                                Log.i(TAG, "Data written.");
-                                isRunning = false;
-                            }
-                        }
+        // Create entry for total time worked
+        PieEntry hoursWorked = new PieEntry(dayPercentage, "Work");
 
-                        Log.i(TAG, "Thread ending.");
-                        return;
-                    }
-                });
-                write.start();
+        // Create entry for the rest of the time
+        PieEntry hoursOther = new PieEntry(otherPercentage, "Other");
 
-                startActivity(new Intent(MainActivity.this, CurrentArea.class));
-            }
-        };
+        List<PieEntry> entries = new ArrayList<>();
+        entries.add(hoursWorked);
+        entries.add(hoursOther);
+
+        PieDataSet set = new PieDataSet(entries, "Current Balance");
+        PieData data = new PieData(set);
+
+        currentBalance.setData(data);
+        currentBalance.invalidate();
     }
 }

@@ -31,19 +31,23 @@
 
         <activity
             android:name=".CurrentArea"
-            android:label="@string/title_activity_current_area">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-
-        </activity>
+            android:label="@string/title_activity_current_area" />
 
         <service android:name=".LocationDataManager" />
 
+        <activity android:name=".InitActivity"> </activity>
         <activity android:name=".MainActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".LocationHistoryActivity"
+            android:label="@string/title_activity_location_history"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 
