@@ -6,6 +6,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
@@ -59,7 +60,7 @@ public class PieChartCreator {
         float timeInRange = range.getVal();
 
         if (timeSpent != 0) {
-            timeSpent = (1 - (timeInRange / timeSpent)) * 100;
+            timeSpent = (1 - (timeSpent / timeInRange)) * 100;
         }
 
         float otherPercentage = 100 - timeSpent;
@@ -90,7 +91,7 @@ public class PieChartCreator {
         float timeInRange = range.getVal();
 
         if (timeSpent != 0) {
-            timeSpent = (1 - (timeInRange / timeSpent)) * 100;
+            timeSpent = (1 - (timeSpent / timeInRange)) * 100;
         }
 
         float otherPercentage = 100 - timeSpent;
@@ -117,13 +118,13 @@ public class PieChartCreator {
     private DateTime getStartOfRange(Range range) {
         switch (range) {
             case CURRENT_DAY:
-                return new DateTime(new LocalDate().now().toDateTimeAtStartOfDay());
+                return new DateTime(LocalDate.now().toDateTimeAtStartOfDay());
             case CURRENT_WEEK:
-                return new DateTime(new LocalDate().now().weekOfWeekyear());
+                return new DateTime(LocalDate.now().withDayOfWeek(DateTimeConstants.MONDAY).toDateTimeAtStartOfDay());
             case CURRENT_MONTH:
-                return new DateTime(new LocalDate().now().monthOfYear());
+                return new DateTime(LocalDate.now().withDayOfMonth(1).toDateTimeAtStartOfDay());
             default:
-                return new DateTime(new LocalDate().now().year());
+                return new DateTime(LocalDate.now().withDayOfYear(1).toDateTimeAtStartOfDay());
         }
     }
 

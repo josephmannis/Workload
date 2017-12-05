@@ -32,13 +32,13 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
 
     private static String TAG = "Current Area";
 
-    private TextView timeView;
-
     private boolean activityResumed = false;
 
     private boolean firstUpdate = false;
 
     private BroadcastReceiver broadcastReceiver;
+
+    private TextView timeView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

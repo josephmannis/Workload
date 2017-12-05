@@ -9,4 +9,6 @@
     <color name="textSub">#9A9A9A</color>
     <color name="transparent">#009a9a9a</color>
     <color name="main_button_bg">#575757</color>
+    <color name="map_card_bg">#eb303030</color>
+    <color name="map_card_subtext">#94ffffff</color>
 </resources>
