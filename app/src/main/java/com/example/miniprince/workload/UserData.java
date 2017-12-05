@@ -150,8 +150,6 @@ public class UserData implements Serializable {
      */
     public long totalTimeWorked(PieChartCreator.DataType type, DateTime range) {
         switch (type) {
-            case IDEAL:
-                return getIdealTimePerWeek();
             case TOTAL:
                 return getTotalTimeWorkedInArea(allWorkLocations, new ArrayList<UUID>(allWorkLocations.keySet()), range);
             case WORK_SAVED:
@@ -178,5 +176,23 @@ public class UserData implements Serializable {
         }
 
         return total;
+    }
+
+    /**
+     * Determines the ideal amount of work time in a range, based on the ideal value for the week.
+     */
+    public long getIdealTimeInRange(PieChartCreator.Range range) {
+        switch (range) {
+            case CURRENT_DAY:
+                return idealTimePerWeek / 7;
+            case CURRENT_WEEK:
+                return idealTimePerWeek;
+            case CURRENT_MONTH:
+                return idealTimePerWeek * 7;
+            case CURRENT_YEAR:
+                return idealTimePerWeek * 52;
+            default:
+                throw new IllegalStateException("Should not happen.");
+        }
     }
 }

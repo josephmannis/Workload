@@ -18,6 +18,8 @@ package com.example.miniprince.workload;
         import java.util.Calendar;
         import java.util.List;
 
+        import io.paperdb.Paper;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MA";
 
@@ -48,6 +50,12 @@ public class MainActivity extends AppCompatActivity {
         // Read the current user data
         userData = new UserData(144000000);
 
+        // Initialize the chartCreator
+        chartCreator = new PieChartCreator();
+
+        // Initialize Paper
+        Paper.init(this);
+
         DateTime startOfDay = DateTime.now().withTimeAtStartOfDay();
 
         RecordedLocation rl = new RecordedLocation(1,1, LocationType.WORK, true);
@@ -56,10 +64,12 @@ public class MainActivity extends AppCompatActivity {
         RecordedLocation rl1 = new RecordedLocation(2,2, LocationType.WORK, true);
         rl1.addInterval(new Interval(startOfDay, new DateTime(36000000 + startOfDay.getMillis())));
 
-     //   userData.storeNewLocation(rl);
-     //   userData.storeNewLocation(rl1);
+        userData.storeNewLocation(rl);
+        userData.storeNewLocation(rl1);
 
-        refreshData();
+        Paper.book().write("user_data", userData);
+
+        refreshData(PieChartCreator.DataType.TOTAL, PieChartCreator.Range.CURRENT_DAY);
     }
 
     /**
@@ -67,32 +77,10 @@ public class MainActivity extends AppCompatActivity {
      */
     private void refreshData(PieChartCreator.DataType type,
                              PieChartCreator.Range range) {
-        Log.i(TAG, Long.toString(userData.getTimeWorkedThisDay()));
 
-        currentBalance = chartCreator.generate(type, range);
-
-        idealBalance = chartCreator.generate(PieChartCreator.DataType.IDEAL, range);
-
-        float timeInDay = 86400000;
-
-        float dayPercentage = (1 - (timeInDay / userData.getTimeWorkedThisDay())) * 100;
-        Log.i(TAG, Float.toString(dayPercentage));
-        float otherPercentage = 100 - dayPercentage;
-
-        // Create entry for total time worked
-        PieEntry hoursWorked = new PieEntry(dayPercentage, "Work");
-
-        // Create entry for the rest of the time
-        PieEntry hoursOther = new PieEntry(otherPercentage, "Other");
-
-        List<PieEntry> entries = new ArrayList<>();
-        entries.add(hoursWorked);
-        entries.add(hoursOther);
-
-        PieDataSet set = new PieDataSet(entries, "Current Balance");
-        PieData data = new PieData(set);
-
-        currentBalance.setData(data);
+        currentBalance.setData(chartCreator.generateGeneralDistribution(type, range));
         currentBalance.invalidate();
+
+        idealBalance.setData(chartCreator.generateIdealDistribution(range));
     }
 }
