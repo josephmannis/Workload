@@ -1,20 +1,241 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.miniprince.workload.MainActivity">
+    android:orientation="vertical"
+    tools:context="com.example.miniprince.workload.MainActivity"
+    android:background="@color/colorPrimary"
+    android:clipToPadding="false">
 
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/current_balance"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:id="@+id/balance_portion"
+        android:layout_marginBottom="20dp">
 
-    <com.github.mikephil.charting.charts.PieChart
-        android:id="@+id/ideal_balance"
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_balance_title"
+            android:text="Your Balance"
+            android:textSize="36dp"
+            android:fontFamily="sans-serif-medium"
+            android:textAlignment="center"
+            android:textColor="@color/textDefault"
+            android:layout_marginBottom="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/main_balance_sub"
+            android:text="Here's your balance for today so far:"
+            android:textSize="16dp"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/textSub"
+            android:textAlignment="center"/>
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/current_balance"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_margin="20dp"
+            />
+
+        <!-- Distribution selection bar -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:elevation="4dp"
+            android:background="@color/colorPrimaryDark">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SHOW DISTRIBUTION FOR:"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/textDefault"
+                android:paddingLeft="10dp"/>
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/balance_dist_spinner"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true">
+
+            </Spinner>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="0dp">
+
+            <RelativeLayout
+                android:clickable="true"
+                android:background="@drawable/main_button_bg"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/hours_worked_text"
+                    android:text="5"
+                    android:textAppearance="?android:attr/textAppearanceButton"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="36dp"
+                    android:textColor="@color/textDefault"/>
+
+                <TextView
+                    android:text="WORK HOURS"
+                    android:textAppearance="?android:attr/textAppearanceButton"
+                    android:layout_below="@+id/hours_worked_text"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="@color/textSub"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:clickable="true"
+                android:background="@drawable/main_button_bg"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/other_hours_text"
+                    android:text="5"
+                    android:textAppearance="?android:attr/textAppearanceButton"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="36dp"
+                    android:textColor="@color/textDefault"/>
+
+                <TextView
+                    android:text="OTHER HOURS"
+                    android:textAppearance="?android:attr/textAppearanceButton"
+                    android:layout_below="@+id/other_hours_text"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="@color/textSub"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:clickable="true"
+                android:background="@drawable/main_button_bg"
+                android:layout_width="0dp"
+                android:layout_height="100dp"
+                android:layout_weight="1">
+                <TextView
+                    android:id="@+id/on_track_text"
+                    android:text="YES"
+                    android:textAppearance="?android:attr/textAppearanceButton"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="36dp"
+                    android:textColor="@color/textDefault"/>
+
+                <TextView
+                    android:text="ON TRACK"
+                    android:textAppearance="?android:attr/textAppearanceButton"
+                    android:layout_below="@+id/on_track_text"
+                    android:layout_centerHorizontal="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12dp"
+                    android:textColor="@color/textSub"/>
+
+            </RelativeLayout>
+
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ideal_portion"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/balance_portion"
+        android:orientation="vertical">
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/ideal_title_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="Your Ideal Balance:"
+            android:textAlignment="center"
+            android:textColor="@color/textDefault"
+            android:textSize="36dp" />
+
+        <TextView
+            android:id="@+id/init_sub_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:text="Here's your ideal balance:"
+            android:textAlignment="center"
+            android:textColor="@color/textSub"
+            android:textSize="16dp" />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/ideal_balance"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:layout_margin="20dp" />
+
+        <!-- Distribution selection bar -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/colorPrimaryDark"
+            android:elevation="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:fontFamily="sans-serif-medium"
+                android:paddingLeft="10dp"
+                android:text="SHOW DISTRIBUTION FOR:"
+                android:textColor="@color/textDefault" />
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true">
+
+            </Spinner>
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
+</ScrollView>

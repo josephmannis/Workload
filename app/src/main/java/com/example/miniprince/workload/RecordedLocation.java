@@ -27,6 +27,7 @@ public class RecordedLocation implements Serializable {
     private boolean isSaved;
     private boolean isNewlyCreated;
     private ArrayList<Interval> timesVisited;
+    private String title;
 
     /**
      * Creates a new SavedLocation at the given latitude and longtiude, and with the type.
@@ -35,7 +36,7 @@ public class RecordedLocation implements Serializable {
      * @param type the type of this SavedLocation
      * @param isSaved displays whether or not the user has saved this location
      */
-    public RecordedLocation(double latitude, double longitude, LocationType type, boolean isSaved) {
+    public RecordedLocation(double latitude, double longitude, LocationType type, boolean isSaved, String title) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.type = type;
@@ -44,6 +45,7 @@ public class RecordedLocation implements Serializable {
         this.isSaved = isSaved;
         this.isNewlyCreated = true;
         this.timesVisited = new ArrayList<Interval>();
+        this.title = title;
     }
 
     /**
@@ -154,5 +156,30 @@ public class RecordedLocation implements Serializable {
         }
 
         return totalTime;
+    }
+
+    /**
+     * Determines if this event has been visited in the given range.
+     */
+    public boolean isVisitedInRange(DateTime threshold) {
+        for (Interval i : timesVisited) {
+            if (i.getStart().getMillis() >= threshold.getMillis()) {
+                return true;
+            }
+        }
+     return false;
+    }
+
+
+    /**
+     * Gets the title of this RecordedLocation. If the title is null, it means it
+     * was created at an address with no recognizable places around it.
+     */
+    public String getTitle() {
+        if (this.title == null) {
+            return "Unknown.";
+        }
+
+        return title;
     }
 }

@@ -1,35 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.miniprince.workload.InitActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
+    android:theme="@style/AppTheme.NoActionBar">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:theme="@style/AppTheme.NoActionBar">
+
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Input your desired ratio."/>
+        android:id="@+id/init_title_text"
+        android:text="How many hours would you like to work per week?"
+        android:textSize="24dp"
+        android:fontFamily="sans-serif"
+        android:textAlignment="center"
+        android:textColor="@color/textDefault"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/init_sub_text"
+        android:text="You can always change this later."
+        android:textSize="16dp"
+        android:fontFamily="sans-serif"
+        android:textColor="@color/textSub"
+        android:textAlignment="center"/>
+
+    <com.github.mikephil.charting.charts.PieChart
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:id="@+id/init_pie_chart"
+        android:layout_margin="20dp">
+    </com.github.mikephil.charting.charts.PieChart>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/init_info_text"
+            android:text="X hours is Y% of a week."
+            android:textSize="16dp"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/textSub"
+            android:textAlignment="center"/>
 
     <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/ratio_seek_bar"
         app:dsb_min="0"
-        app:dsb_max="100"/>
+        app:dsb_max="168"
+        app:dsb_indicatorColor="@color/colorAccent"
+        app:dsb_progressColor="@color/colorAccent"
+        app:dsb_rippleColor="@color/colorAccent"
+        app:dsb_trackColor="@color/textSub"
+        app:dsb_value="40"/>
+    </LinearLayout>
 
     <Button
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:text="OKAY"
-        android:id="@+id/ok_btn"/>
+        android:layout_alignParentBottom="true"
+        android:id="@+id/ok_btn"
+        android:textColor="@color/colorAccent"
+        android:padding="0dp"
+        android:background="@color/transparent"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="READ OUTPUT"
-        android:id="@+id/read_btn"/>
-
-</LinearLayout>
+</RelativeLayout>

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -31,6 +32,7 @@ import android.widget.Toast;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 import io.paperdb.Paper;
@@ -406,11 +408,21 @@ public class LocationDataManager extends Service {
             else {
                 Log.i(TAG, "Novel location detected, setting.");
 
-                currentRecordedLocation = new RecordedLocation(
-                        location.getLatitude(),
-                        location.getLongitude(),
-                        LocationType.OTHER,
-                        false);
+                Geocoder coder = new Geocoder(this);
+
+                try {
+                    currentRecordedLocation = new RecordedLocation(
+                            location.getLatitude(),
+                            location.getLongitude(),
+                            LocationType.OTHER,
+                            false,
+                            coder.getFromLocation(
+                                    location.getLatitude(),
+                                    location.getLongitude(),
+                                    1).get(0).getFeatureName());
+                } catch (IOException e) {
+                    Log.e(TAG, "COULDN'T RECORD LOCATION");
+                }
             }
         }
 

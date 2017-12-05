@@ -11,5 +11,15 @@
     <string name="title_activity_location_history">LocationHistoryActivity</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="tab_work_text">WORK</string>
+    <string name="tab_other_text">OTHER</string>
+    <string-array name="ranges_array">
+        <item>Today</item>
+        <item>Past Week</item>
+        <item>Past Month</item>
+        <item>Past Year</item>
+    </string-array>
+
+
 
 </resources>

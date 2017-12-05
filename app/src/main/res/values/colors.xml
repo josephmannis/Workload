@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#3a3b3d</color>
-    <color name="colorPrimaryDark">#3a3b3d</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimaryDark">#212121</color>
+    <color name="colorPrimaryDarkUpshade">#ac727478</color>
+    <color name="colorAccent">#cccc4f</color>
     <color name="textDefault">#FFFFFF</color>
     <color name="holo_primary_dark">#212121</color>
+    <color name="textSub">#9A9A9A</color>
+    <color name="transparent">#009a9a9a</color>
+    <color name="main_button_bg">#575757</color>
 </resources>

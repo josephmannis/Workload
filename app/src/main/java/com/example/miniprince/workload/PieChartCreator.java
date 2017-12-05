@@ -10,6 +10,7 @@ import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.paperdb.Paper;
@@ -49,7 +50,7 @@ public class PieChartCreator {
      * @param range the range of time in which to consider data
      * @return a PieChart including data of the given type in the given range
      */
-    public PieData generateGeneralDistribution(DataType type, Range range) {
+    public PieDataSet generateGeneralDistribution(DataType type, Range range) {
         userData = Paper.book().read("user_data");
 
         DateTime startThreshold = getStartOfRange(range);
@@ -73,8 +74,7 @@ public class PieChartCreator {
         entries.add(hoursWorked);
         entries.add(hoursOther);
 
-        PieDataSet set = new PieDataSet(entries, "Current Balance");
-        return new PieData(set);
+        return new PieDataSet(entries, "Current Balance");
     }
 
     /**
@@ -82,7 +82,9 @@ public class PieChartCreator {
      * @param range
      * @return
      */
-    public PieData generateIdealDistribution(Range range) {
+    public PieDataSet generateIdealDistribution(Range range) {
+        userData = Paper.book().read("user_data");
+
         float timeSpent = userData.getIdealTimeInRange(range);
 
         float timeInRange = range.getVal();
@@ -103,8 +105,8 @@ public class PieChartCreator {
         entries.add(hoursWorked);
         entries.add(hoursOther);
 
-        PieDataSet set = new PieDataSet(entries, "Current Balance");
-        return new PieData(set);
+        return new PieDataSet(entries, "Current Balance");
+
     }
 
     /**
@@ -123,5 +125,35 @@ public class PieChartCreator {
             default:
                 return new DateTime(new LocalDate().now().year());
         }
+    }
+
+    /**
+     * Gerenates a DataSet for a PieChart containing specific filters on work locations
+     * after the given range.
+     */
+    public PieData generateWorkLocationDistribution(DataType type, Range range) {
+        userData = Paper.book().read("user_data");
+
+        // Current date
+        DateTime curr = getStartOfRange(range);
+
+        // Sum of time for all relevant locations
+        float totalRelevantTime = userData.totalTimeWorked(type, curr);
+
+        // All relevant locations
+        ArrayList<RecordedLocation> relevantLocs = userData.getEventsInRange(type, curr);
+
+        // List of entries for data
+        List<PieEntry> entries = new ArrayList<>();
+
+        // For each locaiton, get the total percentage of the distribution
+        for (RecordedLocation r : relevantLocs) {
+            float timeSpent = (1 - (totalRelevantTime / r.getTimeVisitedInRange(curr))) * 100;
+
+            entries.add(new PieEntry(timeSpent, r.getTitle()));
+        }
+
+        PieDataSet set = new PieDataSet(entries, "Distribution of Work");
+        return new PieData(set);
     }
 }

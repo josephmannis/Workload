@@ -50,6 +50,7 @@ public class UserData implements Serializable {
     // Ideal number of hours the user would like to be working per week, in milliseconds.
     private long idealTimePerWeek = -1;
 
+
     public UserData(long idealTimePerWeek) {
         this.allWorkLocations = new HashMap<>();
         this.allUnmarkedLocations = new HashMap<>();
@@ -76,8 +77,8 @@ public class UserData implements Serializable {
 
     /**
      * Determines if the given location is within range of any work locations in this user's history.
+     *
      * @param location the location to examine
-     * @return true if the location is found
      * @return null if the location is not found
      */
     public RecordedLocation searchForPastWorkLocation(Location location) {
@@ -92,8 +93,8 @@ public class UserData implements Serializable {
 
     /**
      * Determines if the given location is within range of any OTHER locations in this user's history.
+     *
      * @param location the location to examine
-     * @return true if the location is found
      * @return null if the location is not found
      */
     public RecordedLocation searchForPastOtherLocation(Location location) {
@@ -108,6 +109,7 @@ public class UserData implements Serializable {
 
     /**
      * Determines the type of a RecordedLocation and stores it in the corresponding location.
+     *
      * @throws IllegalArgumentException if the RecordedLocation passed is already in the database
      */
     public void storeNewLocation(RecordedLocation r) {
@@ -144,7 +146,8 @@ public class UserData implements Serializable {
 
     /**
      * Determines the total type worked in the given category of RecordedLocations.
-     * @param type the category of RecordedLocations to search through
+     *
+     * @param type  the category of RecordedLocations to search through
      * @param range the date at which a location must start after to be considered
      * @return the total time for that category in the given range
      */
@@ -163,9 +166,10 @@ public class UserData implements Serializable {
 
     /**
      * Gets the total type worked in the given category of RecordedLocations. Helper for totalTimeWorked
+     *
      * @param source the map to search for ids in
-     * @param keys the ids of all relevant RecordedLocations
-     * @param range the threshold for a RecordedLocation to be considered
+     * @param keys   the ids of all relevant RecordedLocations
+     * @param range  the threshold for a RecordedLocation to be considered
      * @return the total time spent based on the given conditions
      */
     private long getTotalTimeWorkedInArea(HashMap<UUID, RecordedLocation> source, List<UUID> keys, DateTime range) {
@@ -195,4 +199,38 @@ public class UserData implements Serializable {
                 throw new IllegalStateException("Should not happen.");
         }
     }
+
+    /**
+     * Gets a list of all the events in the given range, of the given type.
+     */
+    public ArrayList<RecordedLocation> getEventsInRange(PieChartCreator.DataType type, DateTime range) {
+        ArrayList<UUID> keySet = getCorrectKeySet(type);
+        ArrayList<RecordedLocation> events = new ArrayList<>();
+
+        for (UUID id : keySet) {
+            RecordedLocation temp = allWorkLocations.get(id);
+            if (temp.isVisitedInRange(range)) {
+                events.add(temp);
+            }
+        }
+
+        return events;
+    }
+
+    /**
+     * Gets the relevant keyset for the given work type.
+     */
+    private ArrayList<UUID> getCorrectKeySet(PieChartCreator.DataType type) {
+        switch (type) {
+            case TOTAL:
+                return new ArrayList<UUID>(allWorkLocations.keySet());
+            case WORK_SAVED:
+                return savedLocations;
+            case WORK_UNSAVED:
+                return unsavedLocations;
+            default:
+                throw new IllegalStateException("No recognized data type.");
+        }
+    }
+
 }
