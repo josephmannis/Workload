@@ -13,6 +13,8 @@ import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.List;
@@ -40,6 +44,12 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
 
     private TextView timeView;
 
+    private TextView areaTitle;
+
+    private TextView locationStatus;
+
+    private Button currentActionButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +61,17 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
 
         // Set the time view
         timeView = findViewById(R.id.time_field);
+
+        // Set the area title
+        areaTitle = findViewById(R.id.location_title);
+
+        // Set the location status
+        locationStatus = findViewById(R.id.location_status);
+
+        // Set the actionButton
+        currentActionButton = findViewById(R.id.area_action_button);
+
+        initOnClickListener();
 
         // Make sure permissions to request location are granted
         if (!locationPermissionsGranted()) {
@@ -91,15 +112,19 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
                 long currTime = intent.getLongExtra(LocationDataManager.LOCATION_TIME, 0);
                 boolean shouldUpdateMap = intent.getBooleanExtra(LocationDataManager.SHOULD_UPDATE_LOCATION, false);
                 boolean firstUpdate = intent.getBooleanExtra(LocationDataManager.SHOULD_PAN, false);
+                String title = intent.getStringExtra(LocationDataManager.AREA_NAME);
+                boolean status = intent.getBooleanExtra(LocationDataManager.SAVED_LOCATION, false);
 
                 if (firstUpdate) {
                     setUpdateStatus(firstUpdate);
                 }
 
                 updateTime(currTime);
+                updateText(title, status);
 
                 if (shouldUpdateMap || activityResumed) {
                     updateMap(latitude, longitude);
+                    resetButton(status);
                     activityResumed = false;
                 } else {
                     Log.i(TAG, "Location unchanged, UI remaining the same.");
@@ -220,6 +245,55 @@ public class CurrentArea extends FragmentActivity implements OnMapReadyCallback 
         }
         catch (IOException e) {
             // Let the user know we couldn't get anything.
+        }
+    }
+
+    /**
+     * Updates the textView notifying the user what type of location is currently being visited.
+     */
+    private void updateText(String title, boolean saved) {
+        areaTitle.setText(title);
+        Log.i(TAG, title);
+        if (saved) {
+            locationStatus.setText("Saved Location");
+        } else {
+            locationStatus.setText("Unsaved Location");
+        }
+    }
+
+    /**
+     * Initializes the onclicklistener for the action button
+     */
+    private void initOnClickListener() {
+        this.currentActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String curr = (String) currentActionButton.getText();
+
+                switch (curr) {
+                    case "MARK AS WORK":
+                        Intent mark = new Intent("mark.as.work");
+                        sendBroadcast(mark);
+                        currentActionButton.setText("SAVE AS WORK");
+                        break;
+                    case "SAVE AS WORK":
+                        Intent save = new Intent("save.as.work");
+                        sendBroadcast(save);
+                        currentActionButton.setVisibility(View.GONE);
+                        break;
+                }
+
+            }
+        });
+    }
+
+    /**
+     * Updates the button based on new locations.
+     */
+    private void resetButton(boolean isSaved) {
+        if (!isSaved) {
+            currentActionButton.setText("MARK AS WORK");
+            currentActionButton.setVisibility(View.VISIBLE);
         }
     }
 }

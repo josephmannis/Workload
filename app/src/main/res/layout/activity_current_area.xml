@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
             android:paddingTop="10dp"
-            android:text="Snell Library"
+            android:text="Finding Location"
             android:textSize="48sp"
             android:textColor="@color/textDefault"
             android:id="@+id/location_title"
@@ -38,7 +38,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
-            android:text="New Location"
             android:textSize="36sp"
             android:textColor="@color/map_card_subtext"
             android:id="@+id/location_status"
@@ -63,16 +62,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/time_field"
-                android:text="30 Minutes"
+
                 android:textSize="18sp"
                 android:textColor="@color/textSub"
                 android:fontFamily="sans-serif"/>
 
         </LinearLayout>
-
-
-
     </LinearLayout>
 
-
+<Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/map_card_bg"
+    android:layout_marginVertical="20dp"
+    android:layout_marginHorizontal="20dp"
+    android:layout_alignParentBottom="true"
+    android:text="MARK AS WORK"
+    android:textColor="@color/textDefault"
+    android:id="@+id/area_action_button"
+    android:visibility="gone"/>
 </RelativeLayout>

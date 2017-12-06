@@ -115,7 +115,7 @@ public class PieChartCreator {
      * @param range the range type
      * @return the relevant Interval
      */
-    private DateTime getStartOfRange(Range range) {
+    public DateTime getStartOfRange(Range range) {
         switch (range) {
             case CURRENT_DAY:
                 return new DateTime(LocalDate.now().toDateTimeAtStartOfDay());

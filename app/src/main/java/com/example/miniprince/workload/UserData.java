@@ -179,6 +179,7 @@ public class UserData implements Serializable {
             total += source.get(id).getTimeVisitedInRange(range);
         }
 
+        Log.i(TAG, "Total: " + total);
         return total;
     }
 

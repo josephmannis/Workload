@@ -49,6 +49,7 @@ public class InitActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_init);
         JodaTimeAndroid.init(this);
+        Paper.init(this);
 
         initButtonListener();
         bar = findViewById(R.id.ratio_seek_bar);
@@ -71,8 +72,7 @@ public class InitActivity extends AppCompatActivity {
         });
 
         infoView = findViewById(R.id.init_info_text);
-
-        Paper.init(this);
+        updateText();
     }
 
     /**

@@ -60,7 +60,9 @@ public class LocationDataManager extends Service {
             EXTRA_LONGITUDE = "extra_longitude",
             LOCATION_TIME = "location_time",
             SHOULD_UPDATE_LOCATION = "should_update_location",
-            SHOULD_PAN = "should_pan";
+            SHOULD_PAN = "should_pan",
+    AREA_NAME = "area_name",
+    SAVED_LOCATION = "saved_location";
 
     // TODO: threshold is set pretty low, probably want like 20 minutes
     public static final int
@@ -103,6 +105,9 @@ public class LocationDataManager extends Service {
 
     // BroadcastReceiver to receive intent content when the user does an action on a notification
     private BroadcastReceiver nReceiver;
+
+    // Indicator for if the user manually saved
+    private boolean manualSave = false;
 
     class MapServiceBinder extends Binder {
         public MapServiceBinder getService() {
@@ -177,7 +182,9 @@ public class LocationDataManager extends Service {
                     case "save.as.work":
                         Log.i(TAG, "Saving as work.");
                         currentRecordedLocation.setSaved(true);
+                        manualSave = true;
                         status = NotificationStatus.SAVED_WORK;
+
                         // I think we have to manually store it here, or set a value for manual save from user
                         // Also need to add a situation where GPS is lost, and so things stop recording for a bit but pick back up after
                         break;
@@ -185,6 +192,7 @@ public class LocationDataManager extends Service {
                         Log.i(TAG, "Marking as work.");
                         currentRecordedLocation.setLocationType(LocationType.WORK);
                         status = NotificationStatus.UNSAVED_WORK;
+                        manualSave = true;
                         break;
                     default: break;
                 }
@@ -230,6 +238,29 @@ public class LocationDataManager extends Service {
         });
 
         fetch.start();
+    }
+
+    /**
+     * Rewrites current data to the database.
+     */
+    private void saveUserData() {
+        Log.i(TAG, "Saving user data.");
+
+        Thread save = new Thread(new Runnable() {
+            volatile boolean isRunning = true;
+
+            @Override
+            public void run() {
+                Log.i(TAG, "Starting to write data.");
+
+                Paper.book().write(getResources().getString(R.string.user_data), currentData);
+
+                Log.i(TAG, "Thread ending.");
+                return;
+            }
+        });
+
+        save.start();
     }
 
     @Override
@@ -286,6 +317,9 @@ public class LocationDataManager extends Service {
             @Override
             public void onLocationChanged(Location location) {
                 Log.i(TAG, "New Location received.");
+
+                // Save the current data
+                saveUserData();
 
                 // Perform checks on the new location compared to the current one
                 updateCurrentLocation(location, MIN_DISTANCE);
@@ -374,6 +408,7 @@ public class LocationDataManager extends Service {
      */
     private void initializeNewLocationData(Location location) {
         Log.i(TAG, "Initializing RL data for new location.");
+        manualSave = false;
 
         // If this isn't the first RecordedLocation since starting
         if (currentRecordedLocation != null) {
@@ -382,6 +417,7 @@ public class LocationDataManager extends Service {
             // Set the last visited time to the current time
             Interval startFinish = new Interval(startTime, new DateTime());
             currentRecordedLocation.addInterval(startFinish);
+            saveUserData();
         }
 
 
@@ -533,16 +569,18 @@ public class LocationDataManager extends Service {
 
         /* If the user is not currently being notified about their location and they've spent enough
            time in the given location*/
-        if (getTimeSinceLocation(location.getTime()) >= minTime) {
+        if (getTimeSinceLocation(location.getTime()) >= minTime || manualSave) {
             Log.i(TAG, "Time threshold met, checking for notification.");
 
             // If the user has not been notified already
-            if (status == NotificationStatus.UNREGISTERED_EVENT) {
+            if (status == NotificationStatus.UNREGISTERED_EVENT || manualSave) {
                 Log.i(TAG, "User is not being notified.");
 
                 // If the event is newly created, store it in the correct database
                 if (currentRecordedLocation.isNewlyCreated()) {
+                    Log.i(TAG, "Attempting to store data.");
                     currentData.storeNewLocation(currentRecordedLocation);
+                    saveUserData();
                 }
 
                 // Update the status of the current location
@@ -579,6 +617,8 @@ public class LocationDataManager extends Service {
             intent.putExtra(LOCATION_TIME, getTimeSinceLocation(location.getTime()));
             intent.putExtra(SHOULD_UPDATE_LOCATION, isAreaUpdated);
             intent.putExtra(SHOULD_PAN, firstUpdate);
+            intent.putExtra(AREA_NAME, currentRecordedLocation.getTitle());
+            intent.putExtra(SAVED_LOCATION, currentRecordedLocation.isSaved());
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         }
     }

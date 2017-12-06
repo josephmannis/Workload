@@ -4,6 +4,8 @@ package com.example.miniprince.workload;
         import android.app.FragmentManager;
         import android.content.Context;
         import android.content.Intent;
+        import android.graphics.PorterDuff;
+        import android.graphics.drawable.Drawable;
         import android.os.Build;
         import android.support.annotation.RequiresApi;
         import android.support.v4.widget.DrawerLayout;
@@ -13,6 +15,7 @@ package com.example.miniprince.workload;
         import android.util.Log;
         import android.view.LayoutInflater;
         import android.view.Menu;
+        import android.view.MenuItem;
         import android.view.View;
         import android.view.ViewGroup;
         import android.widget.AdapterView;
@@ -80,6 +83,12 @@ public class MainActivity extends AppCompatActivity {
     // Items in the nav pane
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
 
+    // View for hours worked
+    private TextView hoursWorked;
+
+    // View for other hours
+    private TextView otherHours;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +120,9 @@ public class MainActivity extends AppCompatActivity {
         initDrawerToggle();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        final Drawable hamburger = getResources().getDrawable(R.drawable.ic_menu_white);
+//        hamburger.setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
+//        getSupportActionBar().setHomeAsUpIndicator(hamburger);
 
         // Initialize the chart for current balance
         currentBalance = (PieChart) findViewById(R.id.current_balance);
@@ -127,22 +139,26 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Paper
         Paper.init(this);
 
-        DateTime startOfDay = DateTime.now().withTimeAtStartOfDay();
-
-        RecordedLocation rl = new RecordedLocation(1, 1, LocationType.WORK, true, "Home");
-        rl.addInterval(new Interval(startOfDay, new DateTime(28800000 + startOfDay.getMillis())));
-
-        RecordedLocation rl1 = new RecordedLocation(2, 2, LocationType.WORK, true, "Snell");
-        rl1.addInterval(new Interval(startOfDay, new DateTime(36000000 + startOfDay.getMillis())));
-
-        userData.storeNewLocation(rl);
-        userData.storeNewLocation(rl1);
-
-        Paper.book().write("user_data", userData);
-
         currRange = PieChartCreator.Range.CURRENT_DAY;
 
+        hoursWorked = findViewById(R.id.hours_worked_text);
+
+        otherHours = findViewById(R.id.other_hours_text);
         initSpinner();
+        refreshData();
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i(TAG, "Resuming main.");
         refreshData();
     }
 
@@ -167,15 +183,41 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
+
+
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle
+        // If it returns true, then it has handled
+        // the nav drawer indicator touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        // Handle your other action bar items...
+
+        return super.onOptionsItemSelected(item);
+    }
 
     /**
      * Refreshes the data of each PieChart in the display.
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void refreshData() {
+        userData = Paper.book().read(getString(R.string.user_data));
+        long time = userData.totalTimeWorked(PieChartCreator.DataType.TOTAL, chartCreator.getStartOfRange(currRange)) / 3600000;
+        Log.i(TAG, " "+time);
+
+        long other = 24 - time;
+
+        hoursWorked.setText(Long.toString(time));
+
+        otherHours.setText(Long.toString(other));
+
+
         PieDataSet current = chartCreator.generateGeneralDistribution(PieChartCreator.DataType.TOTAL, currRange);
 
         current.setColors(new ArrayList<Integer>(Arrays.asList(getColor(R.color.colorAccent), getColor(R.color.colorPrimaryDarkUpshade))));
